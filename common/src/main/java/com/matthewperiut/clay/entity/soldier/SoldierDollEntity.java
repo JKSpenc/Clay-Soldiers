@@ -242,6 +242,10 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     }
 
     public ITeam getTeam() {
+        if(team == null) {
+            return CLAY_TEAM.get();
+        }
+
         return team;
     }
 

@@ -1,5 +1,6 @@
 package com.matthewperiut.clay.item.common;
 
+import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.block.entity.DispenserBlockEntity;
@@ -37,9 +38,15 @@ public class DollDispenserBehavior implements DispenserBehavior
             Entity e = entityType.spawnFromItemStack(world, stack, null, spawnPos, SpawnReason.DISPENSER, false, false);
             if (e != null)
             {
+	            var team = doll.getTeam(stack);
+	            if (e instanceof SoldierDollEntity soldier)
+	            {
+		            soldier.setTeam(team);
+	            }
+
                 world.playSound(null, pos, SoundEvents.BLOCK_GRAVEL_BREAK, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 world.emitGameEvent(GameEvent.ENTITY_PLACE, spawnPos, GameEvent.Emitter.of(e));
-                stack.setCount(stack.getCount() - 1);
+                stack.decrement(1);
             }
         }
 

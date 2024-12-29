@@ -75,13 +75,13 @@ public class SpawnDollItem extends Item {
 
                 if (entity == null) continue;
 
-                itemStack.decrement(1);
-                world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
-                world.playSound(context.getPlayer(), blockPos, SoundEvents.BLOCK_GRAVEL_BREAK, SoundCategory.BLOCKS, 1.f, 1.f);
-
                 if (entity instanceof SoldierDollEntity soldier) {
                     soldier.setTeam(team);
                 }
+
+                itemStack.decrement(1);
+                world.emitGameEvent(context.getPlayer(), GameEvent.ENTITY_PLACE, blockPos);
+                world.playSound(context.getPlayer(), blockPos, SoundEvents.BLOCK_GRAVEL_BREAK, SoundCategory.BLOCKS, 1.f, 1.f);
             }
 
             return ActionResult.CONSUME;
