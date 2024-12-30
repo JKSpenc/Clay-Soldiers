@@ -11,10 +11,8 @@ import net.minecraft.world.World;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class DisruptorDispenserBehavior extends FallibleItemDispenserBehavior
-{
-    protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack)
-    {
+public class DisruptorDispenserBehavior extends FallibleItemDispenserBehavior {
+    protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
         World world = pointer.world();
 
         if (world.isClient()) {
@@ -25,11 +23,8 @@ public class DisruptorDispenserBehavior extends FallibleItemDispenserBehavior
 
         if (item instanceof DisruptorItem disruptor) {
             this.setSuccess(disruptor.killClayEntity(world, Vec3d.ofCenter(pointer.pos())));
-            if (this.isSuccess()) {
-                if (!disruptor.unlimited) {
-                    stack.damage(1, (ServerWorld) world, (ServerPlayerEntity) null, i -> stack.setCount(0));
-
-                }
+            if (this.isSuccess() && !disruptor.isUnlimited()) {
+                stack.damage(1, (ServerWorld) world, null, i -> stack.setCount(0));
             }
         }
 

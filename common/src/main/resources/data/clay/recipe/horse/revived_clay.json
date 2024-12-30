@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:ghast_tear",
+    "clay:horse/brick"
+  ],
+  "result": {
+    "count": 1,
+    "id": "clay:horse/clay"
+  }
+}

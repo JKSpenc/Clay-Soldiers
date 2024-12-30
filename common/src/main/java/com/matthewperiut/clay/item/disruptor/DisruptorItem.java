@@ -8,79 +8,71 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.function.Consumer;
 
-public class DisruptorItem extends ToolItem
-{
-    public DisruptorItem(ToolMaterial material, Settings settings)
-    {
-        super(material, settings);
+public class DisruptorItem extends Item {
+
+    private final boolean unlimited;
+
+    public DisruptorItem(Settings settings) {
+        this(settings, false);
     }
 
-    boolean unlimited = false;
-
-    public DisruptorItem(Settings settings)
-    {
-        super(new ClayMaterial(), settings);
-        unlimited = true;
+    public DisruptorItem(Settings settings, boolean unlimited) {
+        super(settings);
+        this.unlimited = unlimited;
     }
 
-    public boolean killClayEntity(World world, Vec3d pos)
-    {
+    public boolean isUnlimited() {
+        return unlimited;
+    }
+
+    public boolean killClayEntity(World world, Vec3d pos) {
         Box area = new Box(pos.subtract(new Vec3d(16, 16, 16)), pos.add(new Vec3d(16, 16, 16)));
         List<Entity> entityList = world.getOtherEntities(null, area);
 
         boolean found = false;
         for (Entity entity : entityList)
-        {
-            if (entity instanceof SoldierDollEntity || entity instanceof HorseDollEntity)
-            {
-                entity.kill();
+            if (entity instanceof SoldierDollEntity || entity instanceof HorseDollEntity) {
+                if (world instanceof ServerWorld serverWorld)
+                    entity.kill(serverWorld);
                 found = true;
             }
-        }
 
         return found;
     }
 
-    public boolean removeClayEntity(World world, Entity user, ItemStack stack)
-    {
+    public boolean removeClayEntity(World world, Entity user, ItemStack stack) {
         boolean found = killClayEntity(world, user.getPos());
 
-        if (found)
-        {
-            if (!unlimited)
-            {
-                stack.damage(1, (ServerWorld) world, (ServerPlayerEntity) user, item -> stack.setCount(0));
-                ((PlayerEntity) user).getItemCooldownManager().set(this, 20);
+        if (found) {
+            if (!unlimited) {
+                if (world instanceof ServerWorld serverWorld)
+                    stack.damage(1, serverWorld, (ServerPlayerEntity) user, item -> stack.setCount(0));
+                ((PlayerEntity) user).getItemCooldownManager().set(stack, 20);
 
                 return true;
             }
 
-            if (user instanceof PlayerEntity)
-            {
-                ((PlayerEntity) user).getItemCooldownManager().set(this, 20);
+            if (user instanceof PlayerEntity) {
+                ((PlayerEntity) user).getItemCooldownManager().set(stack, 20);
                 return true;
-            }
-            else
-            {
-                stack.damage(1, (ServerWorld) world, (ServerPlayerEntity) user, item -> stack.setCount(0));
-                ((PlayerEntity) user).getItemCooldownManager().set(this, 20);
+            } else {
+                if (world instanceof ServerWorld serverWorld)
+                    stack.damage(1, serverWorld, (ServerPlayerEntity) user, item -> stack.setCount(0));
+                ((PlayerEntity) user).getItemCooldownManager().set(stack, 20);
 
                 return true;
             }
@@ -88,23 +80,18 @@ public class DisruptorItem extends ToolItem
         return false;
     }
 
-    public boolean removeClayBlock(World world, Entity user, ItemStack stack)
-    {
+    public boolean removeClayBlock(World world, Entity user, ItemStack stack) {
         Vec3d pos = user.getPos();
         Box area = new Box(pos.subtract(new Vec3d(16, 16, 16)), pos.add(new Vec3d(16, 16, 16)));
         boolean found = false;
 
-        for (int x = (int) area.minX; x <= (int) area.maxX; x++)
-        {
-            for (int y = (int) area.minY; y <= (int) area.maxY; y++)
-            {
-                for (int z = (int) area.minZ; z <= (int) area.maxZ; z++)
-                {
+        for (int x = (int) area.minX; x <= (int) area.maxX; x++) {
+            for (int y = (int) area.minY; y <= (int) area.maxY; y++) {
+                for (int z = (int) area.minZ; z <= (int) area.maxZ; z++) {
                     BlockPos blockPos = new BlockPos(x, y, z);
                     BlockState blockState = world.getBlockState(blockPos);
 
-                    if (blockState.getBlock().getDefaultState().equals(Blocks.CLAY.getDefaultState()))
-                    {
+                    if (blockState.getBlock().getDefaultState().equals(Blocks.CLAY.getDefaultState())) {
                         world.breakBlock(blockPos, true);
                         found = true;
                     }
@@ -112,24 +99,21 @@ public class DisruptorItem extends ToolItem
             }
         }
 
-        if (found)
-        {
-            if (!unlimited)
-            {
-                stack.damage(1, (ServerWorld) world, (ServerPlayerEntity) user, item -> stack.setCount(0));
-                ((PlayerEntity) user).getItemCooldownManager().set(this, 20);
+        if (found) {
+            if (!unlimited) {
+                if (world instanceof ServerWorld serverWorld)
+                    stack.damage(1, serverWorld, (ServerPlayerEntity) user, item -> stack.setCount(0));
+                ((PlayerEntity) user).getItemCooldownManager().set(stack, 20);
                 return true;
             }
 
-            if (user instanceof PlayerEntity)
-            {
-                ((PlayerEntity) user).getItemCooldownManager().set(this, 20);
+            if (user instanceof PlayerEntity) {
+                ((PlayerEntity) user).getItemCooldownManager().set(stack, 20);
                 return true;
-            }
-            else
-            {
-                stack.damage(1, (ServerWorld) world, (ServerPlayerEntity) user, item -> stack.setCount(0));
-                ((PlayerEntity) user).getItemCooldownManager().set(this, 20);
+            } else {
+                if (world instanceof ServerWorld serverWorld)
+                    stack.damage(1, serverWorld, (ServerPlayerEntity) user, item -> stack.setCount(0));
+                ((PlayerEntity) user).getItemCooldownManager().set(stack, 20);
                 return true;
             }
         }
@@ -138,15 +122,13 @@ public class DisruptorItem extends ToolItem
 
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand)
-    {
-
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
 
         if (removeClayEntity(world, user, itemStack) || removeClayBlock(world, user, itemStack))
-            return TypedActionResult.consume(itemStack);
+            return ActionResult.CONSUME;
 
-        return TypedActionResult.fail(itemStack);
+        return ActionResult.FAIL;
     }
 
     @Override

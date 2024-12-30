@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "minecraft:magenta_dye"
+    ],
+    "result": {
+        "count": 5,
+        "id": "clay:soldier/magenta"
+    }
+}

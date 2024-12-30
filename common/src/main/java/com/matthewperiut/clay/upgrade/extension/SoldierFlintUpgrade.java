@@ -37,7 +37,7 @@ public class SoldierFlintUpgrade implements ISoldierUpgrade {
     @Override
     public void onAdd(SoldierDollEntity soldier) {
         soldier.playSoundIfNotSilent(SoundEvents.BLOCK_ANVIL_USE);
-        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
         EntityAttributeModifier attributeModifier = new EntityAttributeModifier(SOLDIER_FLINT_UPGRADE, 1, EntityAttributeModifier.Operation.ADD_VALUE);
         if (attackInstance != null && !attackInstance.hasModifier(attributeModifier.id()))
             attackInstance.addPersistentModifier(attributeModifier);
@@ -45,7 +45,7 @@ public class SoldierFlintUpgrade implements ISoldierUpgrade {
 
     @Override
     public void onRemove(SoldierDollEntity soldier) {
-        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
         if (attackInstance != null)
             attackInstance.removeModifier(SOLDIER_FLINT_UPGRADE);
     }

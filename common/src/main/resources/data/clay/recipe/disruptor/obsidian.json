@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "minecraft:obsidian",
+    "S": "minecraft:stick",
+    "R": "minecraft:redstone"
+  },
+  "pattern": [
+    "CSC",
+    "CRC"
+  ],
+  "result": {
+    "id": "clay:disruptor/obsidian"
+  }
+}

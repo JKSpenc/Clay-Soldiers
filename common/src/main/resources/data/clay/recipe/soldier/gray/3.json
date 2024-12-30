@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "minecraft:gray_dye"
+    ],
+    "result": {
+        "count": 3,
+        "id": "clay:soldier/gray"
+    }
+}

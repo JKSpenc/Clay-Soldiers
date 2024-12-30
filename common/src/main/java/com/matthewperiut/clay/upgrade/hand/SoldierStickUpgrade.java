@@ -48,7 +48,7 @@ public class SoldierStickUpgrade implements ISoldierUpgrade, IDurable {
     public void onAdd(SoldierDollEntity soldier) {
         soldier.upgradeInstances.get(this).nbtCompound().putShort(IDurable.NBT_KEY, durability);
         soldier.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.STICK, 1));
-        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
         EntityAttributeModifier attributeModifier = new EntityAttributeModifier(SOLDIER_STICK_UPGRADE, 2, EntityAttributeModifier.Operation.ADD_VALUE);
         if (attackInstance != null && !attackInstance.hasModifier(attributeModifier.id()))
             attackInstance.addPersistentModifier(attributeModifier);
@@ -57,7 +57,7 @@ public class SoldierStickUpgrade implements ISoldierUpgrade, IDurable {
     @Override
     public void onRemove(SoldierDollEntity soldier) {
         soldier.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        EntityAttributeInstance attackInstance = soldier.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
         if (attackInstance != null)
             attackInstance.removeModifier(SOLDIER_STICK_UPGRADE);
         if (getDurability(soldier) <= 0)

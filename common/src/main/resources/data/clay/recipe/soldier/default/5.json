@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "#clay:soldiers",
+        "minecraft:water_bucket"
+    ],
+    "result": {
+        "count": 5,
+        "id": "clay:soldier/clay"
+    }
+}

@@ -9,12 +9,15 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
+
+import java.util.function.Supplier;
 
 import static com.matthewperiut.clay.ClayRegistries.getIdentifier;
 
@@ -23,41 +26,41 @@ public class EntityTypeRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES_HORSES = DeferredRegister.create(ClayMod.MOD_ID, (RegistryKey<Registry<EntityType<?>>>) Registries.ENTITY_TYPE.getKey());
     private static final float SOLDIER_HEIGHT = 0.5f;
     private static final float SOLDIER_WIDTH = 0.25f;
-
-    // Soldiers
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> CLAY_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/clay", () -> EntityType.Builder.create(RegularSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/clay").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> RED_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/red", () -> EntityType.Builder.create(RedSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/red").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> YELLOW_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/yellow", () -> EntityType.Builder.create(YellowSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/yellow").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> GREEN_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/green", () -> EntityType.Builder.create(GreenSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/green").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> BLUE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/blue", () -> EntityType.Builder.create(BlueSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/blue").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> ORANGE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/orange", () -> EntityType.Builder.create(OrangeSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/orange").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> MAGENTA_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/magenta", () -> EntityType.Builder.create(MagentaSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/magenta").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> LIGHTBLUE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/lightblue", () -> EntityType.Builder.create(LightblueSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/lightblue").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> LIME_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/lime", () -> EntityType.Builder.create(LimeSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/lime").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> PINK_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/pink", () -> EntityType.Builder.create(PinkSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/pink").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> CYAN_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/cyan", () -> EntityType.Builder.create(CyanSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/cyan").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> PURPLE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/purple", () -> EntityType.Builder.create(PurpleSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/purple").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> BROWN_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/brown", () -> EntityType.Builder.create(BrownSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/brown").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> BLACK_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/black", () -> EntityType.Builder.create(BlackSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/black").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> GRAY_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/gray", () -> EntityType.Builder.create(GraySoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/gray").toString()));
-    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> WHITE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/white", () -> EntityType.Builder.create(WhiteSoldierDoll::new, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(getIdentifier("soldier/white").toString()));
-
     private static final float HORSE_HEIGHT = 0.3f;
     private static final float HORSE_WIDTH = 0.3f;
+
+    // Soldiers
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> CLAY_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/clay", getSoldierTypeSupplier(RegularSoldierDoll::new, "soldier/clay"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> RED_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/red", getSoldierTypeSupplier(RedSoldierDoll::new,"soldier/red"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> YELLOW_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/yellow", getSoldierTypeSupplier(YellowSoldierDoll::new,"soldier/yellow"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> GREEN_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/green", getSoldierTypeSupplier(GreenSoldierDoll::new,"soldier/green"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> BLUE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/blue", getSoldierTypeSupplier(BlueSoldierDoll::new,"soldier/blue"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> ORANGE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/orange", getSoldierTypeSupplier(OrangeSoldierDoll::new, "soldier/orange"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> MAGENTA_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/magenta", getSoldierTypeSupplier(MagentaSoldierDoll::new, "soldier/magenta"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> LIGHTBLUE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/lightblue", getSoldierTypeSupplier(LightblueSoldierDoll::new, "soldier/lightblue"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> LIME_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/lime", getSoldierTypeSupplier(LimeSoldierDoll::new,"soldier/lime"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> PINK_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/pink", getSoldierTypeSupplier(PinkSoldierDoll::new, "soldier/pink"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> CYAN_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/cyan", getSoldierTypeSupplier(CyanSoldierDoll::new,"soldier/cyan"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> PURPLE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/purple", getSoldierTypeSupplier(PurpleSoldierDoll::new, "soldier/purple"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> BROWN_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/brown", getSoldierTypeSupplier(BrownSoldierDoll::new, "soldier/brown"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> BLACK_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/black", getSoldierTypeSupplier(BlackSoldierDoll::new,"soldier/black"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> GRAY_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/gray", getSoldierTypeSupplier(GraySoldierDoll::new, "soldier/gray"));
+    public static final RegistrySupplier<EntityType<? extends SoldierDollEntity>> WHITE_SOLDIER = ENTITY_TYPES_SOLDIERS.register("soldier/white", getSoldierTypeSupplier(WhiteSoldierDoll::new,"soldier/white"));
+
     // Horses
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> DIRT_HORSE = ENTITY_TYPES_HORSES.register("horse/dirt", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/dirt").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> GRASS_HORSE = ENTITY_TYPES_HORSES.register("horse/grass", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/grass").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> MYCELIUM_HORSE = ENTITY_TYPES_HORSES.register("horse/mycelium", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/mycelium").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> SNOW_HORSE = ENTITY_TYPES_HORSES.register("horse/snow", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/snow").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> SAND_HORSE = ENTITY_TYPES_HORSES.register("horse/sand", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/sand").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> GRAVEL_HORSE = ENTITY_TYPES_HORSES.register("horse/gravel", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/gravel").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> FULL_SNOW_HORSE = ENTITY_TYPES_HORSES.register("horse/snowy", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/snowy").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> FULL_GRASS_HORSE = ENTITY_TYPES_HORSES.register("horse/grassy", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/grassy").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> LAPIS_HORSE = ENTITY_TYPES_HORSES.register("horse/lapis", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/lapis").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> CARROT_HORSE = ENTITY_TYPES_HORSES.register("horse/carrot", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/carrot").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> CLAY_HORSE = ENTITY_TYPES_HORSES.register("horse/clay", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/clay").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> SOUL_SAND_HORSE = ENTITY_TYPES_HORSES.register("horse/soul_sand", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/soul_sand").toString()));
-    public static final RegistrySupplier<EntityType<HorseDollEntity>> CAKE_HORSE = ENTITY_TYPES_HORSES.register("horse/cake", () -> EntityType.Builder.create(HorseDollEntity::new, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(getIdentifier("horse/cake").toString()));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> DIRT_HORSE = ENTITY_TYPES_HORSES.register("horse/dirt", getHorseTypeSupplier(HorseDollEntity::new,"horse/dirt"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> GRASS_HORSE = ENTITY_TYPES_HORSES.register("horse/grass", getHorseTypeSupplier(HorseDollEntity::new, "horse/grass"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> MYCELIUM_HORSE = ENTITY_TYPES_HORSES.register("horse/mycelium", getHorseTypeSupplier(HorseDollEntity::new, "horse/mycelium"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> SNOW_HORSE = ENTITY_TYPES_HORSES.register("horse/snow", getHorseTypeSupplier(HorseDollEntity::new,"horse/snow"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> SAND_HORSE = ENTITY_TYPES_HORSES.register("horse/sand", getHorseTypeSupplier(HorseDollEntity::new, "horse/sand"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> GRAVEL_HORSE = ENTITY_TYPES_HORSES.register("horse/gravel", getHorseTypeSupplier(HorseDollEntity::new,"horse/gravel"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> FULL_SNOW_HORSE = ENTITY_TYPES_HORSES.register("horse/snowy", getHorseTypeSupplier(HorseDollEntity::new, "horse/snowy"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> FULL_GRASS_HORSE = ENTITY_TYPES_HORSES.register("horse/grassy", getHorseTypeSupplier(HorseDollEntity::new,"horse/grassy"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> LAPIS_HORSE = ENTITY_TYPES_HORSES.register("horse/lapis", getHorseTypeSupplier(HorseDollEntity::new, "horse/lapis"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> CARROT_HORSE = ENTITY_TYPES_HORSES.register("horse/carrot", getHorseTypeSupplier(HorseDollEntity::new,"horse/carrot"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> CLAY_HORSE = ENTITY_TYPES_HORSES.register("horse/clay", getHorseTypeSupplier(HorseDollEntity::new, "horse/clay"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> SOUL_SAND_HORSE = ENTITY_TYPES_HORSES.register("horse/soul_sand", getHorseTypeSupplier(HorseDollEntity::new,"horse/soul_sand"));
+    public static final RegistrySupplier<EntityType<HorseDollEntity>> CAKE_HORSE = ENTITY_TYPES_HORSES.register("horse/cake", getHorseTypeSupplier(HorseDollEntity::new,"horse/cake"));
 
     public static void init() {
         ENTITY_TYPES_HORSES.register();
@@ -106,5 +109,13 @@ public class EntityTypeRegistry {
     @Environment(EnvType.CLIENT)
     private static void registerSoldier(RegistrySupplier<EntityType<? extends SoldierDollEntity>> soldierType, Identifier texture) {
         ClientInfoStorage.add(soldierType::get, texture, ClientInfoStorage.RendererType.soldier.ordinal());
+    }
+
+    private static <T extends Entity> Supplier getSoldierTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {
+        return () -> EntityType.Builder.create(factory, SpawnGroup.CREATURE).dimensions(SOLDIER_WIDTH, SOLDIER_HEIGHT).build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
+    }
+
+    private static <T extends Entity> Supplier getHorseTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {
+        return () -> EntityType.Builder.create(factory, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
     }
 }

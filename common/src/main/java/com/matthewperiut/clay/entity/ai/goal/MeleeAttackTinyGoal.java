@@ -7,6 +7,7 @@ import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 
@@ -132,17 +133,17 @@ public class MeleeAttackTinyGoal extends Goal
                 pushTowardOther(livingEntity.getPos().subtract(this.mob.getPos()), 0.0125);
             }
 
-            this.attack(livingEntity, d);
+            this.attack((ServerWorld) this.mob.getWorld(), livingEntity, d);
         }
     }
 
-    protected void attack(LivingEntity target, double squaredDistance)
+    protected void attack(ServerWorld world, LivingEntity target, double squaredDistance)
     {
         double d = this.getSquaredMaxAttackDistance(target);
         if (squaredDistance <= d)
         {
             this.mob.swingHand(Hand.MAIN_HAND);
-            this.mob.tryAttack(target);
+            this.mob.tryAttack(world, target);
         }
     }
 

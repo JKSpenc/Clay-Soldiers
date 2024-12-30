@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "clay:item/horse/standard",
+    "tints": [{
+      "type": "minecraft:constant",
+      "value": -12702020
+    }]
+  }
+}

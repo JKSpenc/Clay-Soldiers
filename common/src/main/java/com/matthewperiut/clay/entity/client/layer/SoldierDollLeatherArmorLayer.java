@@ -8,6 +8,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
@@ -27,16 +28,18 @@ public class SoldierDollLeatherArmorLayer extends GeoRenderLayer<SoldierDollEnti
     }
 
     @Override
-    public void render(MatrixStack poseStack, SoldierDollEntity animatable, BakedGeoModel bakedModel, RenderLayer renderType, VertexConsumerProvider bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
+    public void render(MatrixStack poseStack, SoldierDollEntity animatable, BakedGeoModel bakedModel, @Nullable RenderLayer renderType,
+                       VertexConsumerProvider bufferSource, @Nullable VertexConsumer buffer, float partialTick,
+                       int packedLight, int packedOverlay, int renderColor) {
         if (!animatable.upgrades.contains(LEATHER_UPGRADE.get())) return;
 
         RenderLayer renderLayer = BASE_ARMOR_RENDER_TYPE;
 
         if (animatable.upgrades.contains(WOOL_UPGRADE.get())) renderLayer = UPGRADED_ARMOR_RENDER_TYPE;
 
-        super.render(poseStack, animatable, bakedModel, renderType, bufferSource, buffer, partialTick, packedLight, packedOverlay);
+        super.render(poseStack, animatable, bakedModel, renderType, bufferSource, buffer, partialTick, packedLight, packedOverlay, renderColor);
 
-        getRenderer().reRender(getDefaultBakedModel(animatable), poseStack, bufferSource, animatable, renderLayer,
+        getRenderer().reRender(getDefaultBakedModel(animatable, null), poseStack, bufferSource, animatable, renderLayer,
                 bufferSource.getBuffer(renderLayer), partialTick, packedLight, OverlayTexture.DEFAULT_UV,
                 1);
     }

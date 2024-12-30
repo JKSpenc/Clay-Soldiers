@@ -23,7 +23,6 @@ public class ClayRegistries {
     @Environment(EnvType.CLIENT)
     public static void initClient() {
         EntityTypeRegistry.clientRegister();
-        ItemRegistry.clientRegister();
         RenderRegistry.init();
     }
 

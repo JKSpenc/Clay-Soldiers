@@ -1,6 +1,5 @@
 package com.matthewperiut.clay.item.common;
 
-import com.matthewperiut.clay.ClayMod;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.entity.soldier.teams.ITeam;
 import com.matthewperiut.clay.registry.TeamRegistry;
@@ -11,7 +10,6 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -22,7 +20,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -71,7 +68,7 @@ public class SpawnDollItem extends Item {
                 if (types.size() > 1) {
                     entityType = this.getEntityType();
                 }
-                Entity entity = entityType.spawnFromItemStack((ServerWorld) world, itemStack, context.getPlayer(), blockPos2, SpawnReason.SPAWN_EGG, false, !Objects.equals(blockPos, blockPos2) && direction == Direction.UP);
+                Entity entity = entityType.spawnFromItemStack((ServerWorld) world, itemStack, context.getPlayer(), blockPos2, SpawnReason.SPAWN_ITEM_USE, false, !Objects.equals(blockPos, blockPos2) && direction == Direction.UP);
 
                 if (entity == null) continue;
 

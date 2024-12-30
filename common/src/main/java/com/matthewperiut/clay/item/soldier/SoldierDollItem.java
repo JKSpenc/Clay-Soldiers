@@ -7,8 +7,7 @@ import java.util.function.Supplier;
 
 public class SoldierDollItem extends SpawnDollItem
 {
-    public SoldierDollItem(Supplier<EntityType<?>> defaultType, Settings settings)
-    {
+    public SoldierDollItem(Supplier<EntityType<?>> defaultType, Settings settings) {
         super(defaultType, settings);
     }
 }

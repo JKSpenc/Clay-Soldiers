@@ -5,7 +5,9 @@ import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
 @Environment(EnvType.CLIENT)
 public class SoldierDollModel extends GeoModel<SoldierDollEntity>
@@ -18,14 +20,12 @@ public class SoldierDollModel extends GeoModel<SoldierDollEntity>
     }
 
     @Override
-    public Identifier getModelResource(SoldierDollEntity object)
-    {
+    public Identifier getModelResource(SoldierDollEntity object, @Nullable GeoRenderer<SoldierDollEntity> renderer) {
         return Identifier.of(ClayMod.MOD_ID, "geo/clay_soldier.geo.json");
     }
 
     @Override
-    public Identifier getTextureResource(SoldierDollEntity object)
-    {
+    public Identifier getTextureResource(SoldierDollEntity object, @Nullable GeoRenderer<SoldierDollEntity> renderer) {
         return texture_id;
     }
 

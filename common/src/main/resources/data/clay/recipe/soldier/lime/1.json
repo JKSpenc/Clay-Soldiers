@@ -1,0 +1,11 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "#clay:soldiers",
+        "minecraft:lime_dye"
+    ],
+    "result": {
+        "count": 1,
+        "id": "clay:soldier/lime"
+    }
+}

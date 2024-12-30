@@ -5,7 +5,9 @@ import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
 @Environment(EnvType.CLIENT)
 public class HorseDollModel extends GeoModel<HorseDollEntity>
@@ -18,14 +20,12 @@ public class HorseDollModel extends GeoModel<HorseDollEntity>
     }
 
     @Override
-    public Identifier getModelResource(HorseDollEntity object)
-    {
+    public Identifier getModelResource(HorseDollEntity animatable, @Nullable GeoRenderer<HorseDollEntity> renderer) {
         return Identifier.of(ClayMod.MOD_ID, "geo/doll_horse.geo.json");
     }
 
     @Override
-    public Identifier getTextureResource(HorseDollEntity object)
-    {
+    public Identifier getTextureResource(HorseDollEntity animatable, @Nullable GeoRenderer<HorseDollEntity> renderer) {
         return texture_id;
     }
 

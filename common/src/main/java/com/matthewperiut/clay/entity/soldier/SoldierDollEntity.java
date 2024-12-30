@@ -19,6 +19,7 @@ import dev.architectury.networking.NetworkManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.*;
+import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -26,8 +27,12 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.GuardianEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.entity.passive.SquidEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -44,6 +49,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.EntityTrackerEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -53,6 +59,7 @@ import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
@@ -80,7 +87,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
-        return PathAwareEntity.createMobAttributes().add(EntityAttributes.GENERIC_MAX_HEALTH, 5.00f).add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 1.0f).add(EntityAttributes.GENERIC_ATTACK_SPEED, 0.0f).add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25f);
+        return PathAwareEntity.createMobAttributes().add(EntityAttributes.MAX_HEALTH, 5.00f).add(EntityAttributes.ATTACK_DAMAGE, 1.0f).add(EntityAttributes.ATTACK_SPEED, 0.0f).add(EntityAttributes.MOVEMENT_SPEED, 0.25f);
     }
 
     private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> event) {
@@ -130,12 +137,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     protected void selectTargets() {
         this.targetSelector.add(3, new SoldierAIFindTarget.Mount(this, TypeFilter.instanceOf(HorseDollEntity.class)));
         this.targetSelector.add(3, new SoldierAIFindTarget.Upgrade(this, TypeFilter.instanceOf(ItemEntity.class)));
-        targetSelector.add(4, new ActiveTargetGoal<>(this, SoldierDollEntity.class, true, (e) -> {
-            if (e instanceof SoldierDollEntity target) {
-                return !target.getTeam().isinSameTeam(this.getTeam().getTeamId());
-            }
-            return false;
-        }));
+        this.targetSelector.add(4, new ActiveTargetGoal<>(this, SoldierDollEntity.class, true, new SoldierTargetPredicate(this)));
     }
 
     @Override
@@ -167,16 +169,20 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     protected SoundEvent getDeathSound() {
         return SoundEvents.BLOCK_GRAVEL_STEP;
     }
-//region EVENTS
+    //region EVENTS
 
     @Override
     public void onDeath(DamageSource damageSource) {
-        if (this.hasVehicle()) Objects.requireNonNull(this.getVehicle()).kill();
+        World world = this.getWorld();
+        if (this.hasVehicle() && world instanceof ServerWorld serverWorld)
+            Objects.requireNonNull(this.getVehicle()).kill(serverWorld);
+
         if (damageSource.getType().equals(this.getWorld().getDamageSources().inFire().getType()) || (damageSource.getType().equals(this.getWorld().getDamageSources().lava().getType())))
             getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), new ItemStack(ItemRegistry.BRICK_SOLDIER, 1)));
-        for (ISoldierUpgrade upgrade : upgrades) {
+
+        for (ISoldierUpgrade upgrade : upgrades)
             getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), upgrade.getUpgradeItem()));
-        }
+
         super.onDeath(damageSource);
     }
 
@@ -200,9 +206,10 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
 
     @Override
     public boolean handleAttack(Entity attacker) {
-        if (attacker instanceof PlayerEntity) {
-            kill();
-        }
+        World world = getWorld();
+        if (attacker instanceof PlayerEntity && world instanceof ServerWorld serverWorld)
+            kill(serverWorld);
+
         if (attacker instanceof SoldierDollEntity attackerSoldier) {
             this.upgrades.forEach(u -> u.onHit(attackerSoldier, this));
             ISoldierUpgrade upgrade;
@@ -215,16 +222,16 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     }
 
     @Override
-    public boolean tryAttack(Entity target) {
+    public boolean tryAttack(ServerWorld world, Entity target) {
         swingHand(Hand.MAIN_HAND);
-        return super.tryAttack(target);
+        return super.tryAttack(world, target);
     }
-//endregion EVENTS
+    //endregion EVENTS
 
     @Override
     public boolean cannotDespawn() {
         if (this instanceof ISpawnReasonExtension) {
-            return ((ISpawnReasonExtension) this).clay$getSpawnReason() == SpawnReason.SPAWN_EGG;
+            return ((ISpawnReasonExtension) this).clay$getSpawnReason() == SpawnReason.SPAWN_ITEM_USE;
         }
         return super.cannotDespawn();
     }
@@ -298,9 +305,9 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
         this.upgrades = new HashSet<>(syncUpgradeData.getUpgrades());
         this.upgrades.forEach(u -> u.onAdd(this));
     }
-//endregion SYNC
+    //endregion SYNC
 
-//region CLIENT
+    //region CLIENT
 
     @Environment(EnvType.CLIENT)
     public boolean isLightBlockUnaffected() {
@@ -312,7 +319,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
         this.isLightBlockUnaffected = lightBlockUnaffected;
     }
 
-//endregion
+    //endregion
 
     // temp stick fix
     public static final TrackedData<Boolean> HAS_STICK;
@@ -334,6 +341,21 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
             if(getMainHandStack().isOf(Items.STICK)) {
                 dataTracker.set(HAS_STICK, true);
             }
+        }
+    }
+
+    static class SoldierTargetPredicate implements TargetPredicate.EntityPredicate {
+        private final SoldierDollEntity owner;
+
+        public SoldierTargetPredicate(SoldierDollEntity owner) {
+            this.owner = owner;
+        }
+
+        public boolean test(@Nullable LivingEntity livingEntity, ServerWorld serverWorld) {
+            if (livingEntity instanceof SoldierDollEntity target) {
+                return !target.getTeam().isinSameTeam(owner.getTeam().getTeamId());
+            }
+            return false;
         }
     }
 }

@@ -4,10 +4,8 @@ import com.matthewperiut.clay.ClayMod;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.item.common.DollDispenserBehavior;
-import com.matthewperiut.clay.item.disruptor.ClayMaterial;
 import com.matthewperiut.clay.item.disruptor.DisruptorDispenserBehavior;
 import com.matthewperiut.clay.item.disruptor.DisruptorItem;
-import com.matthewperiut.clay.item.disruptor.TerracottaMaterial;
 import com.matthewperiut.clay.item.horse.HorseDollItem;
 import com.matthewperiut.clay.item.soldier.SoldierDollItem;
 import com.matthewperiut.clay.util.ClientInfoStorage;
@@ -17,11 +15,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.FishingRodItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
 
 import java.util.function.Supplier;
 
@@ -35,7 +34,7 @@ public class ItemRegistry {
     public static final DeferredRegister<Item> MISC_ITEMS = DeferredRegister.create(ClayMod.MOD_ID, (RegistryKey<Registry<Item>>) Registries.ITEM.getKey());
 
     //region SOLDIERS
-    public static final RegistrySupplier<Item> BRICK_SOLDIER = registerMiscItem("soldier/brick", () -> new Item(miscSettings()));
+    public static final RegistrySupplier<Item> BRICK_SOLDIER = registerMiscItem("soldier/brick", () -> new Item(miscSettings("soldier/brick")));
 
     public static final RegistrySupplier<Item> CLAY_SOLDIER_ITEM = registerItem("soldier/clay", CLAY_SOLDIER);
     public static final RegistrySupplier<Item> RED_SOLDIER_ITEM = registerItem("soldier/red", RED_SOLDIER);
@@ -56,7 +55,7 @@ public class ItemRegistry {
 //endregion
 
     //region HORSES
-    public static final RegistrySupplier<Item> BRICK_HORSE = registerMiscItem("horse/brick", () -> new Item(miscSettings()));
+    public static final RegistrySupplier<Item> BRICK_HORSE = registerMiscItem("horse/brick", () -> new Item(miscSettings("horse/brick")));
 
     public static final RegistrySupplier<Item> DIRT_HORSE_ITEM = registerHorseDollItem("horse/dirt", DIRT_HORSE);
     public static final RegistrySupplier<Item> SAND_HORSE_ITEM = registerHorseDollItem("horse/sand", SAND_HORSE);
@@ -71,9 +70,9 @@ public class ItemRegistry {
 //endregion
 
     // misc
-    public static RegistrySupplier<Item> CLAY_DISRUPTOR = registerMiscItem("disruptor/clay", () -> new DisruptorItem(new ClayMaterial(), new Item.Settings().maxCount(1).arch$tab(CLAY_MISC_GROUP)));
-    public static RegistrySupplier<Item> TERRACOTTA_DISRUPTOR = registerMiscItem("disruptor/terracotta", () -> new DisruptorItem(new TerracottaMaterial(), new Item.Settings().maxCount(1).arch$tab(CLAY_MISC_GROUP)));
-    public static RegistrySupplier<Item> OBSIDIAN_DISRUPTOR = registerMiscItem("disruptor/obsidian", () -> new DisruptorItem(new Item.Settings().maxCount(1).arch$tab(CLAY_MISC_GROUP)));
+    public static RegistrySupplier<Item> CLAY_DISRUPTOR = registerMiscItem("disruptor/clay", () -> new DisruptorItem(disruptorSettings("disruptor/clay")));
+    public static RegistrySupplier<Item> TERRACOTTA_DISRUPTOR = registerMiscItem("disruptor/terracotta", () -> new DisruptorItem(disruptorSettings("disruptor/terracotta")));
+    public static RegistrySupplier<Item> OBSIDIAN_DISRUPTOR = registerMiscItem("disruptor/obsidian", () -> new DisruptorItem(disruptorSettings("disruptor/obsidian"), true));
 
     public static void init() {
         ITEMS.register();
@@ -97,53 +96,27 @@ public class ItemRegistry {
         dirtHorseItem.types.add(SNOW_HORSE::get);
     }
 
-    @Environment(EnvType.CLIENT)
-    public static void clientRegister() {
-        ClientInfoStorage.add(CLAY_SOLDIER_ITEM, 0xFFAFB5C6);
-        ClientInfoStorage.add(RED_SOLDIER_ITEM, 0xFFF54E42);
-        ClientInfoStorage.add(YELLOW_SOLDIER_ITEM, 0xFFF3CA2F);
-        ClientInfoStorage.add(GREEN_SOLDIER_ITEM, 0xFF536D1B);
-        ClientInfoStorage.add(BLUE_SOLDIER_ITEM, 0xFF353A9F);
-        ClientInfoStorage.add(ORANGE_SOLDIER_ITEM, 0xFFE66E10);
-        ClientInfoStorage.add(MAGENTA_SOLDIER_ITEM, 0xFFBF4CBB);
-        ClientInfoStorage.add(LIGHTBLUE_SOLDIER_ITEM, 0xFF3FB2DB);
-        ClientInfoStorage.add(LIME_SOLDIER_ITEM, 0xFF73BA1A);
-        ClientInfoStorage.add(PINK_SOLDIER_ITEM, 0xFFE791B0);
-        ClientInfoStorage.add(CYAN_SOLDIER_ITEM, 0xFF148C93);
-        ClientInfoStorage.add(PURPLE_SOLDIER_ITEM, 0xFF792AAB);
-        ClientInfoStorage.add(BROWN_SOLDIER_ITEM, 0xFF744A2B);
-        ClientInfoStorage.add(BLACK_SOLDIER_ITEM, 0xFF18181D);
-        ClientInfoStorage.add(GRAY_SOLDIER_ITEM, 0xFF51585D);
-        ClientInfoStorage.add(WHITE_SOLDIER_ITEM, 0xFFE2E6EA);
-
-// Horses
-        ClientInfoStorage.add(DIRT_HORSE_ITEM, 0xFF593A35);
-        ClientInfoStorage.add(GRAVEL_HORSE_ITEM, 0xFFAA9F9E);
-        ClientInfoStorage.add(FULL_GRASS_HORSE_ITEM, 0xFF27B019);
-        ClientInfoStorage.add(FULL_SNOW_HORSE_ITEM, 0xFFDCEAF2);
-        ClientInfoStorage.add(LAPIS_HORSE_ITEM, 0xFF3E2EBC);
-        ClientInfoStorage.add(CARROT_HORSE_ITEM, 0xFFFD6800);
-        ClientInfoStorage.add(CLAY_HORSE_ITEM, 0xFF969BBA);
-        ClientInfoStorage.add(SOUL_SAND_HORSE_ITEM, 0xFF49372C);
-    }
-
     public static RegistrySupplier<Item> registerItem(String name, RegistrySupplier<EntityType<? extends SoldierDollEntity>> entity) {
-        return ITEMS.register(name, () -> new SoldierDollItem(entity::get, settings()));
+        return ITEMS.register(name, () -> new SoldierDollItem(entity::get, settings(name)));
     }
 
     public static RegistrySupplier<Item> registerHorseDollItem(String name, RegistrySupplier<EntityType<HorseDollEntity>> entity) {
-        return HORSE_ITEMS.register(name, () -> new HorseDollItem(entity::get, settings()));
+        return HORSE_ITEMS.register(name, () -> new HorseDollItem(entity::get, settings(name)));
     }
 
     public static RegistrySupplier<Item> registerMiscItem(String name, Supplier<Item> item) {
         return MISC_ITEMS.register(name, item);
     }
 
-    private static Item.Settings settings() {
-        return new Item.Settings().maxCount(16).arch$tab(CLAY_GROUP);
+    private static Item.Settings settings(String name) {
+        return new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ClayMod.MOD_ID, name))).maxCount(16).arch$tab(CLAY_GROUP);
     }
 
-    private static Item.Settings miscSettings() {
-        return new Item.Settings().fireproof().maxCount(16).arch$tab(CLAY_MISC_GROUP);
+    private static Item.Settings disruptorSettings(String name) {
+        return new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ClayMod.MOD_ID, name))).maxCount(1).arch$tab(CLAY_MISC_GROUP);
+    }
+
+    private static Item.Settings miscSettings(String name) {
+        return new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(ClayMod.MOD_ID, name))).fireproof().maxCount(16).arch$tab(CLAY_MISC_GROUP);
     }
 }
