@@ -16,23 +16,22 @@ import java.util.EnumSet;
 
 import static java.lang.Math.sqrt;
 
-public class MeleeAttackTinyGoal extends Goal
-{
+public class AirshipBombTargetGoal extends Goal {
     protected final PathAwareEntity mob;
     private final double speed;
-    private final boolean pauseWhenMobIdle;
     private Path path;
     private long lastUpdateTime;
+    private int cooldown = 0;
+    private static final int MAX_COOLDOWN = 100;
 
-    public MeleeAttackTinyGoal(PathAwareEntity mob, double speed, boolean pauseWhenMobIdle) {
+    public AirshipBombTargetGoal(PathAwareEntity mob, double speed) {
         this.mob = mob;
         this.speed = speed;
-        this.pauseWhenMobIdle = pauseWhenMobIdle;
         this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
     }
 
     public boolean canStart() {
-        if (this.mob.hasVehicle() && this.mob.getVehicle() instanceof AirshipEntity)
+        if (!this.mob.hasVehicle() && !(this.mob.getVehicle() instanceof AirshipEntity))
             return false;
 
         long time = this.mob.getWorld().getTime();
@@ -47,10 +46,7 @@ public class MeleeAttackTinyGoal extends Goal
                 return false;
             else {
                 this.path = this.mob.getNavigation().findPathTo(livingEntity, 0);
-                if (this.path != null)
-                    return true;
-                else
-                    return this.getSquaredMaxAttackDistance(livingEntity) >= this.mob.squaredDistanceTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+                return this.path != null;
             }
         }
     }
@@ -81,46 +77,37 @@ public class MeleeAttackTinyGoal extends Goal
         this.mob.getNavigation().stop();
     }
 
-    public boolean shouldRunEveryTick()
-    {
+    public boolean shouldRunEveryTick() {
         return true;
-    }
-
-    private void pushTowardOther(Vec3d direction, double mod) {
-        Entity mob = this.mob;
-        if (mob != null) {
-            if (mob.hasVehicle()) mob = mob.getVehicle();
-            double x = direction.getX();
-            double y = direction.getY();
-            double z = direction.getZ();
-            double length = sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
-            mob.addVelocity((x / length) * mod, (y / length) * mod, (z / length) * mod);
-        }
     }
 
     public void tick() {
         LivingEntity livingEntity = this.mob.getTarget();
         if (livingEntity != null) {
             this.mob.getLookControl().lookAt(livingEntity, 30.0F, 30.0F);
-            double d = this.mob.squaredDistanceTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-            if ((this.mob.getVisibilityCache().canSee(livingEntity))) {
+            if (this.mob.getVisibilityCache().canSee(livingEntity) && !isAbove(mob.getTarget())) {
                 this.mob.getNavigation().startMovingTo(livingEntity, this.speed);
-                pushTowardOther(livingEntity.getPos().subtract(this.mob.getPos()), 0.0125);
+                Path path = this.mob.getNavigation().findPathTo(livingEntity.getX(), livingEntity.getY() + 5F, livingEntity.getZ(), 1);
+                if (path != null)
+                    this.mob.getNavigation().startMovingAlong(path, speed);
+
             }
 
-            this.attack((ServerWorld) this.mob.getWorld(), livingEntity, d);
+            this.attack((ServerWorld) this.mob.getWorld(), livingEntity);
         }
     }
 
-    protected void attack(ServerWorld world, LivingEntity target, double squaredDistance) {
-        double d = this.getSquaredMaxAttackDistance(target);
-        if (squaredDistance <= d) {
-            this.mob.swingHand(Hand.MAIN_HAND);
-            this.mob.tryAttack(world, target);
-        }
+    protected void attack(ServerWorld world, LivingEntity target) {
+        if (isAbove(target) && cooldown <= 0) {
+            cooldown = MAX_COOLDOWN;
+            ((AirshipEntity) this.mob.getVehicle()).dropBomb(world);
+        } else
+            cooldown--;
     }
 
-    protected double getSquaredMaxAttackDistance(LivingEntity entity) {
-        return 1.0;
+    protected boolean isAbove(LivingEntity target) {
+        double xDiff = Math.abs(this.mob.getX() - target.getX());
+        double zDiff = Math.abs(this.mob.getZ() - target.getZ());
+        return xDiff < 1 && zDiff < 1;
     }
 }

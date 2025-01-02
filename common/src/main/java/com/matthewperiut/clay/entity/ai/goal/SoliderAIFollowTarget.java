@@ -1,11 +1,13 @@
 package com.matthewperiut.clay.entity.ai.goal;
 
+import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.upgrade.UpgradeManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 
@@ -14,6 +16,7 @@ import java.util.EnumSet;
 public abstract class SoliderAIFollowTarget extends Goal {
 
     protected final SoldierDollEntity soldier;
+    protected Path path;
     protected double speed;
 
     public SoliderAIFollowTarget(SoldierDollEntity soldier, double speed) {
@@ -25,18 +28,41 @@ public abstract class SoliderAIFollowTarget extends Goal {
     @Override
     public boolean canStart() {
         Entity target = getTarget();
-        return target != null && target.isAlive() && hasValidTarget();
+        if (target == null)
+            return false;
+
+        if (!target.isAlive() || !hasValidTarget())
+            return false;
+
+        this.path = this.soldier.getNavigation().findPathTo(target, 0);
+        return this.path != null;
+    }
+
+    public boolean shouldContinue() {
+        Entity target = getTarget();
+        if (target == null)
+            return false;
+        else if (!target.isAlive() || !hasValidTarget())
+            return false;
+        else
+            return this.soldier.isInWalkTargetRange(target.getBlockPos());
+    }
+
+    public void start() {
+        this.soldier.getNavigation().startMovingAlong(this.path, this.speed);
+        this.soldier.setAttacking(true);
     }
 
     @Override
     public void tick() {
         Entity target = getTarget();
-        this.soldier.getLookControl().lookAt(target, 30.0F, 30.0F);
-        double distanceToTarget = this.soldier.squaredDistanceTo(target.getX(), target.getY(), target.getZ());
-        if (this.soldier.getRandom().nextFloat() < 0.25F) {
-            this.soldier.getNavigation().startMovingTo(target, this.speed);
+        if (target != null) {
+            this.soldier.getLookControl().lookAt(target, 30.0F, 30.0F);
+            double distanceToTarget = this.soldier.squaredDistanceTo(target.getX(), target.getY(), target.getZ());
+            if (this.soldier.getRandom().nextFloat() < 0.25F)
+                this.soldier.getNavigation().startMovingTo(target, this.speed);
+            action(distanceToTarget);
         }
-        action(distanceToTarget);
     }
 
     @Override
@@ -68,12 +94,13 @@ public abstract class SoliderAIFollowTarget extends Goal {
         @Override
         boolean hasValidTarget() {
             Entity target = getTarget();
-            return target instanceof HorseDollEntity && !target.hasPassengers();
+            return (target instanceof HorseDollEntity || target instanceof AirshipEntity) && !target.hasPassengers();
         }
 
         @Override
         void cleanUp() {
             soldier.setFollowingEntity(null);
+            this.path = null;
         }
 
         @Override
@@ -120,6 +147,7 @@ public abstract class SoliderAIFollowTarget extends Goal {
         @Override
         void cleanUp() {
             soldier.setFollowingEntity(null);
+            this.path = null;
         }
     }
 }

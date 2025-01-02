@@ -1,5 +1,6 @@
 package com.matthewperiut.clay.registry;
 
+import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import dev.architectury.registry.level.entity.EntityAttributeRegistry;
@@ -14,6 +15,9 @@ public class AttributeRegistry {
         });
         EntityTypeRegistry.ENTITY_TYPES_SOLDIERS.forEach(e -> {
             EntityAttributeRegistry.register(() -> (EntityType<? extends LivingEntity>) e.get(), SoldierDollEntity::createAttributes);
+        });
+        EntityTypeRegistry.ENTITY_TYPES_MISC.forEach(e -> {
+            EntityAttributeRegistry.register(() -> (EntityType<? extends LivingEntity>) e.get(), AirshipEntity::setAttributesBuilder);
         });
     }
 }

@@ -1,9 +1,11 @@
 package com.matthewperiut.clay.entity.soldier;
 
 import com.matthewperiut.clay.ClayMod;
+import com.matthewperiut.clay.entity.ai.goal.AirshipBombTargetGoal;
 import com.matthewperiut.clay.entity.ai.goal.MeleeAttackTinyGoal;
 import com.matthewperiut.clay.entity.ai.goal.SoldierAIFindTarget;
 import com.matthewperiut.clay.entity.ai.goal.SoliderAIFollowTarget;
+import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.teams.ITeam;
 import com.matthewperiut.clay.extension.ISpawnReasonExtension;
@@ -82,6 +84,11 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     private ITeam team;
     private boolean isAnimating = false;
 
+    public SoldierDollEntity(EntityType<? extends PathAwareEntity> type, World worldIn, ITeam team) {
+        this(type, worldIn);
+        this.team = team;
+    }
+
     public SoldierDollEntity(EntityType<? extends PathAwareEntity> type, World worldIn) {
         super(type, worldIn);
     }
@@ -135,9 +142,13 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     }
 
     protected void selectTargets() {
-        this.targetSelector.add(3, new SoldierAIFindTarget.Mount(this, TypeFilter.instanceOf(HorseDollEntity.class)));
+        this.targetSelector.add(3, new SoldierAIFindTarget.Mount(this, TypeFilter.instanceOf(AirshipEntity.class), TypeFilter.instanceOf(HorseDollEntity.class)));
         this.targetSelector.add(3, new SoldierAIFindTarget.Upgrade(this, TypeFilter.instanceOf(ItemEntity.class)));
         this.targetSelector.add(4, new ActiveTargetGoal<>(this, SoldierDollEntity.class, true, new SoldierTargetPredicate(this)));
+    }
+
+    protected void airshipGoals() {
+        this.goalSelector.add(3, new AirshipBombTargetGoal(this, 1));
     }
 
     @Override
@@ -151,6 +162,8 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
         this.goalSelector.add(1, new SwimGoal(this));
 
         selectTargets(); // priority 3
+
+        airshipGoals();
 
         super.initGoals();
     }
@@ -174,7 +187,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     @Override
     public void onDeath(DamageSource damageSource) {
         World world = this.getWorld();
-        if (this.hasVehicle() && world instanceof ServerWorld serverWorld)
+        if (this.hasVehicle() && this.getVehicle() instanceof HorseDollEntity && world instanceof ServerWorld serverWorld)
             Objects.requireNonNull(this.getVehicle()).kill(serverWorld);
 
         if (damageSource.getType().equals(this.getWorld().getDamageSources().inFire().getType()) || (damageSource.getType().equals(this.getWorld().getDamageSources().lava().getType())))
@@ -344,7 +357,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
         }
     }
 
-    static class SoldierTargetPredicate implements TargetPredicate.EntityPredicate {
+    public static class SoldierTargetPredicate implements TargetPredicate.EntityPredicate {
         private final SoldierDollEntity owner;
 
         public SoldierTargetPredicate(SoldierDollEntity owner) {
@@ -353,7 +366,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
 
         public boolean test(@Nullable LivingEntity livingEntity, ServerWorld serverWorld) {
             if (livingEntity instanceof SoldierDollEntity target) {
-                return !target.getTeam().isinSameTeam(owner.getTeam().getTeamId());
+                return !target.getTeam().isinSameTeam(owner.getTeam().getTeamId()) && !(target.getVehicle() instanceof AirshipEntity);
             }
             return false;
         }

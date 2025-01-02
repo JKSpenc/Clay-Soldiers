@@ -1,6 +1,8 @@
 package com.matthewperiut.clay.registry;
 
 import com.matthewperiut.clay.ClayMod;
+import com.matthewperiut.clay.entity.airship.AirshipBombEntity;
+import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.entity.soldier.variant.*;
@@ -12,6 +14,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.TntEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -24,8 +27,12 @@ import static com.matthewperiut.clay.ClayRegistries.getIdentifier;
 public class EntityTypeRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES_SOLDIERS = DeferredRegister.create(ClayMod.MOD_ID, (RegistryKey<Registry<EntityType<?>>>) Registries.ENTITY_TYPE.getKey());
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES_HORSES = DeferredRegister.create(ClayMod.MOD_ID, (RegistryKey<Registry<EntityType<?>>>) Registries.ENTITY_TYPE.getKey());
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES_MISC = DeferredRegister.create(ClayMod.MOD_ID, (RegistryKey<Registry<EntityType<?>>>) Registries.ENTITY_TYPE.getKey());
+
     private static final float SOLDIER_HEIGHT = 0.5f;
     private static final float SOLDIER_WIDTH = 0.25f;
+    private static final float AIRSHIP_HEIGHT = 1f;
+    private static final float AIRSHIP_WIDTH = 0.6f;
     private static final float HORSE_HEIGHT = 0.3f;
     private static final float HORSE_WIDTH = 0.3f;
 
@@ -62,9 +69,14 @@ public class EntityTypeRegistry {
     public static final RegistrySupplier<EntityType<HorseDollEntity>> SOUL_SAND_HORSE = ENTITY_TYPES_HORSES.register("horse/soul_sand", getHorseTypeSupplier(HorseDollEntity::new,"horse/soul_sand"));
     public static final RegistrySupplier<EntityType<HorseDollEntity>> CAKE_HORSE = ENTITY_TYPES_HORSES.register("horse/cake", getHorseTypeSupplier(HorseDollEntity::new,"horse/cake"));
 
+    // Airships
+    public static final RegistrySupplier<EntityType<AirshipEntity>> AIRSHIP = ENTITY_TYPES_MISC.register("airship/default", getAirshipTypeSupplier(AirshipEntity::new,"airship/default"));
+    public static final RegistrySupplier<EntityType<AirshipBombEntity>> AIRSHIP_BOMB = ENTITY_TYPES_MISC.register("airship/bomb", getAirshipBombTypeSupplier(AirshipBombEntity::new,"airship/bomb"));
+
     public static void init() {
         ENTITY_TYPES_HORSES.register();
         ENTITY_TYPES_SOLDIERS.register();
+        ENTITY_TYPES_MISC.register();
     }
 
     @Environment(EnvType.CLIENT)
@@ -117,5 +129,18 @@ public class EntityTypeRegistry {
 
     private static <T extends Entity> Supplier getHorseTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {
         return () -> EntityType.Builder.create(factory, SpawnGroup.CREATURE).dimensions(HORSE_WIDTH, HORSE_HEIGHT).build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
+    }
+
+    private static <T extends Entity> Supplier getAirshipTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {
+        return () -> EntityType.Builder.create(factory, SpawnGroup.CREATURE).dimensions(AIRSHIP_WIDTH, AIRSHIP_HEIGHT).build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
+    }
+
+    private static <T extends Entity> Supplier getAirshipBombTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {
+        return () -> EntityType.Builder.create(factory, SpawnGroup.MISC).dropsNothing()
+                .makeFireImmune()
+                .dimensions(0.5F, 0.5F)
+                .maxTrackingRange(10)
+                .trackingTickInterval(10)
+                .build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
     }
 }

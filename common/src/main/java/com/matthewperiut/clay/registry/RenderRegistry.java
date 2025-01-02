@@ -1,5 +1,9 @@
 package com.matthewperiut.clay.registry;
 
+import com.matthewperiut.clay.ClayMod;
+import com.matthewperiut.clay.entity.airship.AirshipEntity;
+import com.matthewperiut.clay.entity.client.AirshipBombRenderer;
+import com.matthewperiut.clay.entity.client.AirshipRenderer;
 import com.matthewperiut.clay.entity.client.HorseDollRenderer;
 import com.matthewperiut.clay.entity.client.SoldierDollRenderer;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
@@ -9,6 +13,10 @@ import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
+import net.minecraft.util.Identifier;
+
+import static com.matthewperiut.clay.registry.EntityTypeRegistry.AIRSHIP;
+import static com.matthewperiut.clay.registry.EntityTypeRegistry.AIRSHIP_BOMB;
 
 @Environment(EnvType.CLIENT)
 public class RenderRegistry {
@@ -26,6 +34,8 @@ public class RenderRegistry {
             if (bundle.type == ClientInfoStorage.RendererType.horse.ordinal()) {
                 EntityRendererRegistry.register(() -> (EntityType<? extends HorseDollEntity>) bundle.entityType.get(), ctx -> new HorseDollRenderer(ctx, bundle.textureID));
             }
+            EntityRendererRegistry.register(AIRSHIP::get, ctx -> new AirshipRenderer(ctx, Identifier.of(ClayMod.MOD_ID, "textures/entity/mount/airship/default.png")));
+            EntityRendererRegistry.register(AIRSHIP_BOMB::get, ctx -> new AirshipBombRenderer(ctx, Identifier.of(ClayMod.MOD_ID, "textures/entity/mount/airship/bomb.png")));
         }
     }
 

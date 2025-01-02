@@ -1,8 +1,10 @@
 package com.matthewperiut.clay.registry;
 
 import com.matthewperiut.clay.ClayMod;
+import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
+import com.matthewperiut.clay.item.airship.AirshipItem;
 import com.matthewperiut.clay.item.common.DollDispenserBehavior;
 import com.matthewperiut.clay.item.disruptor.DisruptorDispenserBehavior;
 import com.matthewperiut.clay.item.disruptor.DisruptorItem;
@@ -74,6 +76,9 @@ public class ItemRegistry {
     public static RegistrySupplier<Item> TERRACOTTA_DISRUPTOR = registerMiscItem("disruptor/terracotta", () -> new DisruptorItem(disruptorSettings("disruptor/terracotta")));
     public static RegistrySupplier<Item> OBSIDIAN_DISRUPTOR = registerMiscItem("disruptor/obsidian", () -> new DisruptorItem(disruptorSettings("disruptor/obsidian"), true));
 
+
+    public static final RegistrySupplier<Item> AIRSHIP_ITEM = registerAirshipItem("airship/default", AIRSHIP);
+
     public static void init() {
         ITEMS.register();
         HORSE_ITEMS.register();
@@ -102,6 +107,10 @@ public class ItemRegistry {
 
     public static RegistrySupplier<Item> registerHorseDollItem(String name, RegistrySupplier<EntityType<HorseDollEntity>> entity) {
         return HORSE_ITEMS.register(name, () -> new HorseDollItem(entity::get, settings(name)));
+    }
+
+    public static RegistrySupplier<Item> registerAirshipItem(String name, RegistrySupplier<EntityType<AirshipEntity>> entity) {
+        return ITEMS.register(name, () -> new AirshipItem(entity::get, settings(name)));
     }
 
     public static RegistrySupplier<Item> registerMiscItem(String name, Supplier<Item> item) {

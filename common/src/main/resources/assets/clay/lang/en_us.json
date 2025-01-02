@@ -61,5 +61,7 @@
   "item.clay.horse.soul_sand": "Soul Sand Horse",
   "entity.clay.horse.soul_sand": "Soul Sand Horse",
   "item.clay.horse.cake": "Cake Horse",
-  "entity.clay.horse.cake": "Cake Horse"
+  "entity.clay.horse.cake": "Cake Horse",
+  "item.clay.airship.default": "Airship",
+  "entity.clay.airship.default": "Airship"
 }
