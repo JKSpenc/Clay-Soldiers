@@ -1,6 +1,7 @@
 package com.matthewperiut.clay.entity.ai.goal;
 
 import com.matthewperiut.clay.entity.airship.AirshipEntity;
+import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
@@ -32,7 +33,7 @@ public class MeleeAttackTinyGoal extends Goal
     }
 
     public boolean canStart() {
-        if (this.mob.hasVehicle() && this.mob.getVehicle() instanceof AirshipEntity)
+        if (this.mob.hasVehicle() && !(this.mob.getVehicle() instanceof HorseDollEntity))
             return false;
 
         long time = this.mob.getWorld().getTime();

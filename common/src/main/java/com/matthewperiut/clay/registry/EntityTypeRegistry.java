@@ -3,6 +3,8 @@ package com.matthewperiut.clay.registry;
 import com.matthewperiut.clay.ClayMod;
 import com.matthewperiut.clay.entity.airship.AirshipBombEntity;
 import com.matthewperiut.clay.entity.airship.AirshipEntity;
+import com.matthewperiut.clay.entity.cannon.CannonEntity;
+import com.matthewperiut.clay.entity.cannon.CannonballEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.entity.soldier.variant.*;
@@ -73,6 +75,11 @@ public class EntityTypeRegistry {
     public static final RegistrySupplier<EntityType<AirshipEntity>> AIRSHIP = ENTITY_TYPES_MISC.register("airship/default", getAirshipTypeSupplier(AirshipEntity::new,"airship/default"));
     public static final RegistrySupplier<EntityType<AirshipBombEntity>> AIRSHIP_BOMB = ENTITY_TYPES_MISC.register("airship/bomb", getAirshipBombTypeSupplier(AirshipBombEntity::new,"airship/bomb"));
 
+
+    public static final RegistrySupplier<EntityType<CannonEntity>> CANNON = ENTITY_TYPES_MISC.register("cannon/default", getSupplier(CannonEntity::new,.5F, .2F, "cannon/default"));
+    public static final RegistrySupplier<EntityType<CannonballEntity>> CANNONBALL = ENTITY_TYPES_MISC.register("cannon/ball", getSupplier(CannonballEntity::new,.1F, .1F, "cannon/ball"));
+
+
     public static void init() {
         ENTITY_TYPES_HORSES.register();
         ENTITY_TYPES_SOLDIERS.register();
@@ -133,6 +140,10 @@ public class EntityTypeRegistry {
 
     private static <T extends Entity> Supplier getAirshipTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {
         return () -> EntityType.Builder.create(factory, SpawnGroup.CREATURE).dimensions(AIRSHIP_WIDTH, AIRSHIP_HEIGHT).build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
+    }
+
+    private static <T extends Entity> Supplier getSupplier(EntityType.EntityFactory<T> factory, float width, float height, String identifierStr) {
+        return () -> EntityType.Builder.create(factory, SpawnGroup.CREATURE).dimensions(width, height).build(RegistryKey.of(Registries.ENTITY_TYPE.getKey(), getIdentifier(identifierStr)));
     }
 
     private static <T extends Entity> Supplier getAirshipBombTypeSupplier(EntityType.EntityFactory<T> factory, String identifierStr) {

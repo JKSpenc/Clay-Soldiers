@@ -1,5 +1,6 @@
 package com.matthewperiut.clay.entity.airship;
 
+import com.matthewperiut.clay.entity.Mountable;
 import com.matthewperiut.clay.entity.ai.goal.AirshipBombTargetGoal;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.extension.ISpawnReasonExtension;
@@ -40,7 +41,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.EnumSet;
 
-public class AirshipEntity extends PathAwareEntity implements GeoAnimatable {
+public class AirshipEntity extends PathAwareEntity implements GeoAnimatable, Mountable {
     private AnimatableInstanceCache factory = GeckoLibUtil.createInstanceCache(this);
 
     public AirshipEntity(EntityType<? extends PathAwareEntity> entityType, World world) {

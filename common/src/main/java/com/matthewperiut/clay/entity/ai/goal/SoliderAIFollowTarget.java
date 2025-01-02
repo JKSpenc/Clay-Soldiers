@@ -1,5 +1,6 @@
 package com.matthewperiut.clay.entity.ai.goal;
 
+import com.matthewperiut.clay.entity.Mountable;
 import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
@@ -94,7 +95,7 @@ public abstract class SoliderAIFollowTarget extends Goal {
         @Override
         boolean hasValidTarget() {
             Entity target = getTarget();
-            return (target instanceof HorseDollEntity || target instanceof AirshipEntity) && !target.hasPassengers();
+            return (target instanceof Mountable) && !target.hasPassengers();
         }
 
         @Override

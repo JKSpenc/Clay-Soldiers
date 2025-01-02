@@ -1,4 +1,4 @@
-package com.matthewperiut.clay.entity.client;
+package com.matthewperiut.clay.entity.client.airship;
 
 import com.matthewperiut.clay.ClayMod;
 import com.matthewperiut.clay.entity.airship.AirshipEntity;

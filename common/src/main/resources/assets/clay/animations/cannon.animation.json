@@ -1,0 +1,20 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.cannon.wheels": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"wheels": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.5": [-90, 0, 0],
+						"1.0": [-180, 0, 0],
+						"1.5": [-270, 0, 0],
+						"2.0": [-360, 0, 0]
+					}
+				}
+			}
+		}
+	}
+}

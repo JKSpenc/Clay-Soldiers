@@ -1,11 +1,9 @@
 package com.matthewperiut.clay.entity.soldier;
 
 import com.matthewperiut.clay.ClayMod;
-import com.matthewperiut.clay.entity.ai.goal.AirshipBombTargetGoal;
-import com.matthewperiut.clay.entity.ai.goal.MeleeAttackTinyGoal;
-import com.matthewperiut.clay.entity.ai.goal.SoldierAIFindTarget;
-import com.matthewperiut.clay.entity.ai.goal.SoliderAIFollowTarget;
+import com.matthewperiut.clay.entity.ai.goal.*;
 import com.matthewperiut.clay.entity.airship.AirshipEntity;
+import com.matthewperiut.clay.entity.cannon.CannonEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.teams.ITeam;
 import com.matthewperiut.clay.extension.ISpawnReasonExtension;
@@ -142,13 +140,17 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
     }
 
     protected void selectTargets() {
-        this.targetSelector.add(3, new SoldierAIFindTarget.Mount(this, TypeFilter.instanceOf(AirshipEntity.class), TypeFilter.instanceOf(HorseDollEntity.class)));
+        this.targetSelector.add(3, new SoldierAIFindTarget.Mount(this, TypeFilter.instanceOf(CannonEntity.class), TypeFilter.instanceOf(AirshipEntity.class), TypeFilter.instanceOf(HorseDollEntity.class)));
         this.targetSelector.add(3, new SoldierAIFindTarget.Upgrade(this, TypeFilter.instanceOf(ItemEntity.class)));
-        this.targetSelector.add(4, new ActiveTargetGoal<>(this, SoldierDollEntity.class, true, new SoldierTargetPredicate(this)));
+        this.targetSelector.add(4, new SoldierTargetingGoal<>(this, SoldierDollEntity.class, true));
     }
 
     protected void airshipGoals() {
         this.goalSelector.add(3, new AirshipBombTargetGoal(this, 1));
+    }
+
+    protected void cannonGoals() {
+        this.goalSelector.add(1, new CannonFireAtTargetGoal(this, 1.0, 20, 60.0F));
     }
 
     @Override
@@ -164,6 +166,7 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
         selectTargets(); // priority 3
 
         airshipGoals();
+        cannonGoals();
 
         super.initGoals();
     }
@@ -354,21 +357,6 @@ public class SoldierDollEntity extends PathAwareEntity implements GeoAnimatable,
             if(getMainHandStack().isOf(Items.STICK)) {
                 dataTracker.set(HAS_STICK, true);
             }
-        }
-    }
-
-    public static class SoldierTargetPredicate implements TargetPredicate.EntityPredicate {
-        private final SoldierDollEntity owner;
-
-        public SoldierTargetPredicate(SoldierDollEntity owner) {
-            this.owner = owner;
-        }
-
-        public boolean test(@Nullable LivingEntity livingEntity, ServerWorld serverWorld) {
-            if (livingEntity instanceof SoldierDollEntity target) {
-                return !target.getTeam().isinSameTeam(owner.getTeam().getTeamId()) && !(target.getVehicle() instanceof AirshipEntity);
-            }
-            return false;
         }
     }
 }

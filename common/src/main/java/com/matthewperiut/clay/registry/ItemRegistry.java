@@ -5,6 +5,7 @@ import com.matthewperiut.clay.entity.airship.AirshipEntity;
 import com.matthewperiut.clay.entity.horse.HorseDollEntity;
 import com.matthewperiut.clay.entity.soldier.SoldierDollEntity;
 import com.matthewperiut.clay.item.airship.AirshipItem;
+import com.matthewperiut.clay.item.cannon.CannonItem;
 import com.matthewperiut.clay.item.common.DollDispenserBehavior;
 import com.matthewperiut.clay.item.disruptor.DisruptorDispenserBehavior;
 import com.matthewperiut.clay.item.disruptor.DisruptorItem;
@@ -78,6 +79,7 @@ public class ItemRegistry {
 
 
     public static final RegistrySupplier<Item> AIRSHIP_ITEM = registerAirshipItem("airship/default", AIRSHIP);
+    public static final RegistrySupplier<Item> CANNON_ITEM = registerMiscItem("cannon/default", () -> new CannonItem(CANNON::get, settings("cannon/default")));
 
     public static void init() {
         ITEMS.register();
